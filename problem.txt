@@ -1,0 +1,23 @@
+针对在运行ssserver -c /etc/shadowsocks.json -d start出现的问题作出详细解决
+出现error如下：
+attributeerror undefined symbol:EVP_CIPHER_CTX_cleanup
+解决方法及原因如下：
+此问题的形成是因为在openssl1.1.0版本中，废弃了EVP_CIPHER_CTX_cleanup函数
+解决的关键是找到openssl.py文件路径
+1.找到openssl.py文件路径
+find / -name openssl.py //找到文件路径
+2.修改openssl.py文件
+（这里的路径是本次配置时的路径，具体情况具体分析）
+vim /usr/local/lib/python2.7/dist-packages/shadowsocks/crypto/openssl.py
+进入vim编辑器模式
+使用/cleanup在文本中搜索
+然后使用i进入到编辑模式，文中有两处有cleanup，改为reset
+将第52行libcrypto.EVP_CIPHER_CTX_cleanup.argtypes = (c_void_p,) 
+改为libcrypto.EVP_CIPHER_CTX_reset.argtypes = (c_void_p,)
+再次搜索cleanup（全文件共2处，此处位于111行），将libcrypto.EVP_CIPHER_CTX_cleanup(self._ctx) 
+改为libcrypto.EVP_CIPHER_CTX_reset(self._ctx)
+然后保存之后再次搜索cleanup，若不出现则成功
+退出文本编辑模式
+3.再次启用ss服务：
+ssserver -c /etc/shadowsocks.json -d start 在后台启用
+出现started为成功运行服务器。
