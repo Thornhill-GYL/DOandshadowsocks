@@ -1,0 +1,38 @@
+此文档是配置服务器过程
+1.选择服务器：
+在digitalocean上选择低配装置：Ubuntu+5dollar
+选择地点：纽约或者加州
+配置时选上IPV6
+SSH等有时间再加上
+2.通过console平台登录服务器：
+会收到初始密码的邮件
+首次登录输入密码即可，会要求更改密码；
+注意！在要求更改密码时，会首先输入现在的密码；然后更改密码，确认密码
+3.安装python+pip和shadowsocks
+直接输入
+apt-get update//更新源中包列表
+apt-get install python-pip
+pip install --upgrade pip//更新pip
+pip install shadowsocks//若这步出错则使用sudo pip install shadowsocks
+这里到shadowsocks安装成功就行
+4.配置ss文件
+在上一步的ss安装成功之后进行
+vim /etc/shadowsocks.json//进入vim编辑器
+在vim编辑器下：
+输入：i//切换到输入模式
+输入：
+{
+	"server":"::",//保证IPV4和IPV6
+	"server_port":8926,//我最喜欢的一个端口号，可变
+	"local_address": "127.0.0.1",
+	"local_port":1080,
+	"password":"你设置的密码",
+	"timeout":300,
+	"method":"aes-256-cfb",
+	"fast_open": false
+}
+输入：esc(取消键）
+输入：：wq//保存并退出
+5.运行配置文件
+输入：ssserver -c /etc/shadowsocks.json -d start
+然后出现started为成功，若出现问题，看problem.txt文件
